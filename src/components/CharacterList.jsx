@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { fetchCharacters, fetchCharacter, fetchPlanet } from '../services/api';
+import Shimmer from './Shimmer'; // Import Shimmer component
 import '../App.css'; // Import styles
 
 const CharacterList = () => {
@@ -9,6 +10,7 @@ const CharacterList = () => {
   const [limit] = useState(10); // Default limit of 10 items per page
   const [search, setSearch] = useState('');
   const [characters, setCharacters] = useState([]);
+  const [loadingDetails, setLoadingDetails] = useState(false); // Track loading state for details and planet APIs
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['characters', page, limit, search],
@@ -20,6 +22,7 @@ const CharacterList = () => {
   useEffect(() => {
     const fetchCharacterDetails = async () => {
       if (data?.results) {
+        setLoadingDetails(true); // Start loading details
         const detailedCharacters = await Promise.all(
           data.results.map(async (char) => {
             try {
@@ -42,6 +45,7 @@ const CharacterList = () => {
           })
         );
         setCharacters(detailedCharacters.filter((char) => char !== null)); // Filter out failed fetches
+        setLoadingDetails(false); // Stop loading details
       }
     };
 
@@ -65,7 +69,16 @@ const CharacterList = () => {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  // Show shimmer UI if either the characters API or details/planet APIs are still loading
+  if (isLoading || loadingDetails) {
+    return (
+      <div className="container">
+        <h1 className="title">Star Wars Characters</h1>
+        <Shimmer count={10} type="card" /> {/* Show shimmer UI */}
+      </div>
+    );
+  }
+
   if (error) return <div>Error loading characters</div>;
 
   return (
