@@ -1,71 +1,157 @@
-# star-wars-allica
-# Getting Started with Create React App
+import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import Button from './Button';
+import { fetchCharacters } from '../services/api';
+import { transformSearchResults, transformCharacterResults } from '../services/characterService';
+import '../App.css'; // Import styles
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+const CharacterList = () => {
+  const [page, setPage] = useState(1);
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+  const [characters, setCharacters] = useState([]);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['characters', page, search],
+    queryFn: () => fetchCharacters(page, search),
+    keepPreviousData: true, // Keep previous data while fetching new data
+  });
 
-## Available Scripts
+  useEffect(() => {
+    const fetchCharacterDetails = async () => {
+      console.log('API response data:', data); // Debug API response
+      if (data?.result && Array.isArray(data.result)) {
+        // Handle search API response
+        try {
+          const detailedCharacters = await transformSearchResults(data.result);
+          console.log('Detailed characters from search API:', detailedCharacters);
+          setCharacters(detailedCharacters);
+        } catch (error) {
+          console.error('Error transforming search results:', error);
+        }
+      } else if (data?.results && Array.isArray(data.results)) {
+        // Handle fetch characters API response
+        try {
+          const detailedCharacters = await transformCharacterResults(data.results);
+          console.log('Detailed characters from fetch characters API:', detailedCharacters);
+          setCharacters(detailedCharacters);
+        } catch (error) {
+          console.error('Error transforming character results:', error);
+        }
+      } else {
+        console.log('No results found in API response.');
+        setCharacters([]); // Clear characters if no results
+      }
+    };
 
-In the project directory, you can run:
+    fetchCharacterDetails();
+  }, [data]);
 
-### `npm start`
+  const handleSearchClick = () => {
+    console.log('Search triggered with input:', searchInput);
+    setSearch(searchInput); // Trigger search with the input value
+    setPage(1); // Reset to the first page when searching
+  };
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+  const handleNextPage = () => {
+    console.log('Next page triggered.');
+    if (data?.next) setPage((prev) => prev + 1);
+  };
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+  const handlePreviousPage = () => {
+    console.log('Previous page triggered.');
+    if (data?.previous) setPage((prev) => prev - 1);
+  };
 
-### `npm test`
+  if (isLoading) {
+    console.log('Loading data...');
+    return <div>Loading...</div>;
+  }
+  if (error) {
+    console.error('Error loading data:', error);
+    return <div>Error loading characters</div>;
+  }
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  return (
+    <div className="container">
+      <h1 className="title">Star Wars Characters</h1>
+      <div className="search-container">
+        <input
+          type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          placeholder="Search by name..."
+          className="search-input"
+        />
+        <button onClick={handleSearchClick} className="search-button">
+          Search
+        </button>
+      </div>
+      <div className="character-list">
+        {characters.length > 0 ? (
+          characters.map((char) => (
+            <Link key={char.uid} to={`/character/${char.uid}`} className="character-card">
+              <h3 className="character-name">{char.name}</h3>
+              <p className="character-detail">Gender: {char.gender}</p>
+              <p className="character-detail">Homeworld: {char.homeworld}</p>
+            </Link>
+          ))
+        ) : (
+          <p className="no-results">No characters found.</p>
+        )}
+      </div>
+      <div className="pagination-container">
+        <button
+          onClick={handlePreviousPage}
+          disabled={!data?.previous}
+          className="pagination-button"
+        >
+          Previous
+        </button>
+        <button
+          onClick={handleNextPage}
+          disabled={!data?.next}
+          className="pagination-button"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+};
 
-### `npm run build`
+export default CharacterList;
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+==========
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+import { fetchCharacter, fetchPlanet } from './api';
 
-### `npm run eject`
+export const transformSearchResults = async (searchResults) => {
+  return Promise.all(
+    searchResults.map(async (char) => {
+      const homeworldDetails = await fetchPlanet(char.properties.homeworld); // Fetch homeworld details
+      return {
+        uid: char.properties.uid,
+        name: char.properties.name,
+        gender: char.properties.gender,
+        homeworld: homeworldDetails.result.properties.name, // Extract planet name
+      };
+    })
+  );
+};
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+export const transformCharacterResults = async (characterResults) => {
+  return Promise.all(
+    characterResults.map(async (char) => {
+      const details = await fetchCharacter(char.uid); // Fetch character details
+      const homeworldDetails = await fetchPlanet(details.result.properties.homeworld); // Fetch homeworld details
+      return {
+        uid: char.uid,
+        name: char.name,
+        gender: details.result.properties.gender,
+        homeworld: homeworldDetails.result.properties.name, // Extract planet name
+      };
+    })
+  );
+};
