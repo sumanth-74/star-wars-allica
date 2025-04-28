@@ -7,28 +7,39 @@ import Shimmer from './Shimmer'; // Import Shimmer component
 import '../App.css'; // Import styles
 
 const CharacterList = () => {
-  const { characters, fetchAndCacheCharacter } = useFavorites();
+  const { characters, fetchAndCacheCharacter, loading } = useFavorites();
   const [page, setPage] = useState(1);
-  const [limit] = useState(10); // Default limit of 10 items per page
+  const [limit] = useState(12); // Default limit of 12 items per page
   const [search, setSearch] = useState('');
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading: isFetchingCharacters, error } = useQuery({
     queryKey: ['characters', page, limit, search],
     queryFn: () => fetchCharacters(page, limit, search),
     keepPreviousData: true, // Keep previous data while fetching new data
     staleTime: 5 * 60 * 1000, // Cache data for 5 minutes
   });
 
+  const normalizeCharacterData = (char) => {
+    // Normalize the character data to ensure consistent structure
+    return {
+      url: char.url || char.properties?.url,
+      uid: char.uid || char.properties?.uid,
+      name: char.name || char.properties?.name,
+    };
+  };
+
   useEffect(() => {
     const fetchAllDetails = async () => {
-      if (data?.results) {
+      if (!data) return;
+
+      const results = data?.results || data?.result || []; // Handle both response structures
+      if (results.length > 0) {
         await Promise.all(
-          data.results.map(async (char) => {
-            if (!char.url) {
-              console.error('Invalid character URL:', char);
-              return;
+          results.map(async (char) => {
+            const charUrl = char.url || char.properties?.url;
+            if (charUrl) {
+              await fetchAndCacheCharacter(charUrl); // Fetch and cache character and planet details
             }
-            await fetchAndCacheCharacter(char.url); // Fetch and cache character and planet details
           })
         );
       }
@@ -54,18 +65,22 @@ const CharacterList = () => {
     }
   };
 
-  if (isLoading) {
+  if (isFetchingCharacters || loading) {
     return (
       <div className="container">
         <h1 className="title">Star Wars Characters</h1>
-        <Shimmer count={10} type="card" /> {/* Show shimmer UI */}
+        <Shimmer count={12} /> {/* Show shimmer UI */}
       </div>
     );
   }
 
   if (error) return <div>Error loading characters</div>;
 
-  const characterUrls = data?.results.map((char) => char.url) || [];
+  // Normalize the API response to handle both `data.results` and `data.result`
+  const results = data?.results || data?.result || [];
+  const characterUrls = results
+    .map((char) => normalizeCharacterData(char).url)
+    .filter(Boolean); // Normalize and filter valid URLs
   const characterList = characterUrls.map((url) => characters[url]).filter(Boolean);
 
   return (
@@ -73,13 +88,17 @@ const CharacterList = () => {
       <h1 className="title">Star Wars Characters</h1>
       <SearchBar onSearch={handleSearchClick} />
       <div className="character-list">
-        {characterList.map((char) => (
-          <Link key={char.uid} to={`/character/${char.uid}`} className="character-card">
-            <h3 className="character-name">{char.name}</h3>
-            <p className="character-detail">Gender: {char.gender || 'unknown'}</p>
-            <p className="character-detail">Homeworld: {char.homeworld || 'unknown'}</p>
-          </Link>
-        ))}
+        {characterList.length > 0 ? (
+          characterList.map((char) => (
+            <Link key={char.uid} to={`/character/${char.uid}`} className="character-card">
+              <h3 className="character-name">{char.name}</h3>
+              <p className="character-detail">Gender: {char.gender || 'unknown'}</p>
+              <p className="character-detail">Homeworld: {char.homeworld || 'unknown'}</p>
+            </Link>
+          ))
+        ) : (
+          <p className="no-results">No characters found.</p>
+        )}
       </div>
       <div className="pagination-container">
         <button

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaEdit } from 'react-icons/fa'; // Import edit icon
+import { FaEdit, FaSave, FaTimes } from 'react-icons/fa'; // Import edit, save, and cancel icons
 import { useFavorites } from '../contexts/FavoritesContext';
 import '../App.css'; // Import styles
 
@@ -11,9 +11,6 @@ const CharacterDetails = () => {
 
   // Ensure the characterUrl matches the keys in the characters cache
   const characterUrl = `https://www.swapi.tech/api/people/${id}`;
-  console.log('Characters cache:', characters); // Debugging log
-  console.log('Character URL:', characterUrl); // Debugging log
-
   const character = characters[characterUrl];
   const isFavorite = favorites.some((fav) => fav.url === characterUrl);
 
@@ -30,9 +27,26 @@ const CharacterDetails = () => {
     setEditingField(null); // Exit editing mode
   };
 
+  const handleCancel = () => {
+    setEditingField(null); // Exit editing mode without saving
+  };
+
   if (!character) {
     return <div>Character details not found.</div>; // Handle missing character details
   }
+
+  const renderCharacterAttributes = () => {
+    const attributes = Object.entries(character).filter(
+      ([key]) => !['url', 'uid', 'name', 'height', 'gender', 'homeworld'].includes(key) // Exclude already displayed fields
+    );
+
+    return attributes.map(([key, value]) => (
+      <div key={key} className="character-attribute">
+        <span className="attribute-key">{key.replace('_', ' ')}:</span>
+        <span className="attribute-value">{value || 'unknown'}</span>
+      </div>
+    ));
+  };
 
   return (
     <div className="character-details-container">
@@ -44,43 +58,80 @@ const CharacterDetails = () => {
       </div>
       <div className="character-details-section">
         <h2>Basic Information</h2>
-        <div className="character-detail">
-          <span>Height: </span>
-          {editingField === 'height' ? (
-            <input
-              type="text"
-              value={fieldValue}
-              onChange={(e) => setFieldValue(e.target.value)}
-              className="edit-input"
-            />
-          ) : (
-            <span>{character.height || 'unknown'}</span>
-          )}
-          <FaEdit
-            className="edit-icon"
-            onClick={() => handleEdit('height')}
-            title="Edit Height"
-          />
+        <div className="editable-attribute">
+          <span className="attribute-key">Height:</span>
+          <div className="editable-field">
+            {editingField === 'height' ? (
+              <>
+                <input
+                  type="text"
+                  value={fieldValue}
+                  onChange={(e) => setFieldValue(e.target.value)}
+                  className="edit-input"
+                />
+                <FaSave
+                  className="save-icon"
+                  onClick={handleSave}
+                  title="Save Height"
+                />
+                <FaTimes
+                  className="cancel-icon"
+                  onClick={handleCancel}
+                  title="Cancel Edit"
+                />
+              </>
+            ) : (
+              <>
+                <span className="attribute-value">{character.height || 'unknown'}</span>
+                <FaEdit
+                  className="edit-icon"
+                  onClick={() => handleEdit('height')}
+                  title="Edit Height"
+                />
+              </>
+            )}
+          </div>
         </div>
-        <div className="character-detail">
-          <span>Gender: </span>
-          {editingField === 'gender' ? (
-            <input
-              type="text"
-              value={fieldValue}
-              onChange={(e) => setFieldValue(e.target.value)}
-              className="edit-input"
-            />
-          ) : (
-            <span>{character.gender || 'unknown'}</span>
-          )}
-          <FaEdit
-            className="edit-icon"
-            onClick={() => handleEdit('gender')}
-            title="Edit Gender"
-          />
+        <div className="editable-attribute">
+          <span className="attribute-key">Gender:</span>
+          <div className="editable-field">
+            {editingField === 'gender' ? (
+              <>
+                <input
+                  type="text"
+                  value={fieldValue}
+                  onChange={(e) => setFieldValue(e.target.value)}
+                  className="edit-input"
+                />
+                <FaSave
+                  className="save-icon"
+                  onClick={handleSave}
+                  title="Save Gender"
+                />
+                <FaTimes
+                  className="cancel-icon"
+                  onClick={handleCancel}
+                  title="Cancel Edit"
+                />
+              </>
+            ) : (
+              <>
+                <span className="attribute-value">{character.gender || 'unknown'}</span>
+                <FaEdit
+                  className="edit-icon"
+                  onClick={() => handleEdit('gender')}
+                  title="Edit Gender"
+                />
+              </>
+            )}
+          </div>
         </div>
-        <p>Homeworld: {character.homeworld || 'unknown'}</p>
+        <div className="character-attribute">
+          <span className="attribute-key">Homeworld:</span>
+          <span className="attribute-value">{character.homeworld || 'unknown'}</span>
+        </div>
+        <h2>Additional Information</h2>
+        {renderCharacterAttributes()}
       </div>
       <div className="add-to-favorites-container">
         <button
@@ -91,16 +142,6 @@ const CharacterDetails = () => {
           {isFavorite ? 'Already in Favorites' : 'Add to Favorites'}
         </button>
       </div>
-      {editingField && (
-        <div className="edit-actions">
-          <button onClick={handleSave} className="save-button">
-            Save
-          </button>
-          <button onClick={() => setEditingField(null)} className="cancel-button">
-            Cancel
-          </button>
-        </div>
-      )}
     </div>
   );
 };

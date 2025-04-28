@@ -1,22 +1,46 @@
+/* General Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f9;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
 .App {
   text-align: center;
 }
 
+.container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #1d4ed8;
+}
+
+/* Character List Styles */
 .character-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1rem;
 }
 
 .character-card {
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 1rem;
-  width: 100%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
   text-decoration: none;
+  color: inherit;
 }
 
 .character-card:hover {
@@ -27,6 +51,7 @@
 .character-card h3 {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
+  color: #1d4ed8;
 }
 
 .character-card p {
@@ -54,6 +79,13 @@
   gap: 1rem;
 }
 
+/* Pagination Styles */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
 .pagination-button {
   padding: 0.5rem 1rem;
   background-color: #1d4ed8;
@@ -73,19 +105,7 @@
   cursor: not-allowed;
 }
 
-.container {
-  padding: 1rem;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.title {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
+/* Search Bar Styles */
 .search-container {
   display: flex;
   gap: 0.5rem;
@@ -130,31 +150,6 @@
   color: #888;
 }
 
-.pagination-container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
-}
-
-.pagination-button {
-  padding: 0.5rem 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.pagination-button:hover {
-  background-color: #0056b3;
-}
-
-.pagination-button:disabled {
-  background-color: #ddd;
-  cursor: not-allowed;
-}
-
 /* Character Details Page Styles */
 .character-details-container {
   padding: 2rem;
@@ -175,7 +170,7 @@
 .character-details-header h1 {
   font-size: 2rem;
   font-weight: bold;
-  color: #333;
+  color: #1d4ed8;
 }
 
 .character-details-header button {
@@ -209,6 +204,27 @@
   font-size: 1rem;
   color: #555;
   margin: 0.5rem 0;
+}
+
+.character-attribute {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Align input and icons vertically */
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.attribute-key {
+  font-weight: bold;
+  color: #555;
+  text-transform: capitalize;
+}
+
+.attribute-value {
+  color: #333;
 }
 
 .character-details-list {
@@ -287,7 +303,8 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
-  width: 100px;
+  width: 150px; /* Set a fixed width for consistency */
+  margin-right: 0.5rem; /* Add minimal margin between input and icons */
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -437,17 +454,20 @@
 
 /* Shimmer Styles */
 .shimmer-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Match card grid layout */
   gap: 1rem;
+  margin-top: 1rem;
 }
 
 .shimmer-item {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  height: 100px;
+  height: 150px; /* Match the height of character cards */
   border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Ensure it occupies the full width of the grid column */
 }
 
 @keyframes shimmer {
@@ -461,4 +481,38 @@
 
 .shimmer-card .shimmer-item {
   height: 120px;
+}
+
+.edit-icon,
+.save-icon,
+.cancel-icon {
+  font-size: 1.25rem;
+  color: #007bff;
+  cursor: pointer;
+  margin-left: 0.25rem; /* Minimal margin between icons */
+  transition: color 0.2s, transform 0.2s;
+}
+
+.edit-icon:hover,
+.save-icon:hover,
+.cancel-icon:hover {
+  color: #0056b3;
+  transform: scale(1.1);
+}
+
+.editable-attribute {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Align label and input/icons vertically */
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.editable-field {
+  display: flex;
+  align-items: center; /* Align input and icons vertically */
+  gap: 0.25rem; /* Minimal gap between input and icons */
 }
