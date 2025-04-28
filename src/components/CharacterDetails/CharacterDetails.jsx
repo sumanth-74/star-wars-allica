@@ -1,8 +1,8 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaEdit, FaSave, FaTimes } from 'react-icons/fa'; // Import edit, save, and cancel icons
-import { useFavorites } from '../contexts/FavoritesContext';
-import '../App.css'; // Import styles
+import { FaEdit, FaSave, FaTimes } from 'react-icons/fa'; // Import icons
+import { useFavorites } from '../../contexts/FavoritesContext'; // Updated path
+import '../../App.css';
 
 const CharacterDetails = () => {
   const { id } = useParams();

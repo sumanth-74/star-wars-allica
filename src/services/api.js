@@ -20,5 +20,3 @@ export const fetchPlanet = async (planetUrl) => {
   const response = await axios.get(planetUrl); // Use axios directly for external URLs
   return response.data;
 };
-
-// Remove unused functions

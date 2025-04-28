@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { fetchCharacter, fetchPlanet } from '../services/api';
+import { fetchCharacter, fetchPlanet } from '../services/api'; // Updated path
 
 const FavoritesContext = createContext(null);
 

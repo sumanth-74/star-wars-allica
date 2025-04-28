@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { fetchCharacters } from '../services/api';
-import { useFavorites } from '../contexts/FavoritesContext';
-import Shimmer from './Shimmer'; // Import Shimmer component
-import '../App.css'; // Import styles
+import { fetchCharacters } from '../../services/api'; // Updated path
+import { useFavorites } from '../../contexts/FavoritesContext'; // Updated path
+import Shimmer from '../Shimmer/Shimmer'; // Updated path
+import Pagination from '../Pagination/Pagination'; // Updated path
+import SearchBar from '../SearchBar/SearchBar'; // Updated path
+import '../../App.css';
 
 const CharacterList = () => {
   const { characters, fetchAndCacheCharacter, loading } = useFavorites();
@@ -53,16 +55,8 @@ const CharacterList = () => {
     setPage(1); // Reset to the first page when searching
   };
 
-  const handleNextPage = () => {
-    if (data?.next) {
-      setPage((prev) => prev + 1); // Increment the page number
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (data?.previous) {
-      setPage((prev) => prev - 1); // Decrement the page number
-    }
+  const handlePageChange = (newPage) => {
+    setPage(newPage); // Update the page number
   };
 
   if (isFetchingCharacters || loading) {
@@ -83,6 +77,8 @@ const CharacterList = () => {
     .filter(Boolean); // Normalize and filter valid URLs
   const characterList = characterUrls.map((url) => characters[url]).filter(Boolean);
 
+  const totalPages = data?.total_pages || 1; // Use total_pages from the API response
+
   return (
     <div className="container">
       <h1 className="title">Star Wars Characters</h1>
@@ -100,45 +96,11 @@ const CharacterList = () => {
           <p className="no-results">No characters found.</p>
         )}
       </div>
-      <div className="pagination-container">
-        <button
-          onClick={handlePreviousPage}
-          disabled={!data?.previous}
-          className="pagination-button"
-        >
-          Previous
-        </button>
-        <button
-          onClick={handleNextPage}
-          disabled={!data?.next}
-          className="pagination-button"
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const SearchBar = ({ onSearch }) => {
-  const [searchInput, setSearchInput] = useState('');
-
-  const handleSearch = () => {
-    onSearch(searchInput);
-  };
-
-  return (
-    <div className="search-container">
-      <input
-        type="text"
-        value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-        placeholder="Search by name..."
-        className="search-input"
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
       />
-      <button onClick={handleSearch} className="search-button">
-        Search
-      </button>
     </div>
   );
 };

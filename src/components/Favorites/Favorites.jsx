@@ -1,6 +1,6 @@
 import React from 'react';
-import { useFavorites } from '../contexts/FavoritesContext';
-import '../App.css'; // Ensure this import is correct
+import { useFavorites } from '../../contexts/FavoritesContext'; // Updated path
+import '../../App.css';
 
 const Favorites = () => {
   const { favorites, removeFavorite } = useFavorites();

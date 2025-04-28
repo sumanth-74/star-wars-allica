@@ -1,12 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { FaHeart, FaUsers } from 'react-icons/fa'; // Import heart and users icons
-import CharacterList from './components/CharacterList';
-import CharacterDetails from './components/CharacterDetails';
-import Favorites from './components/Favorites';
-import FavoritesProvider from './contexts/FavoritesContext';
-import './App.css'; // Import styles
+import CharacterList from './components/CharacterList/CharacterList'; // Updated path
+import CharacterDetails from './components/CharacterDetails/CharacterDetails'; // Updated path
+import Favorites from './components/Favorites/Favorites'; // Updated path
+import Navbar from './components/Navbar/Navbar'; // Updated path
+import FavoritesProvider from './contexts/FavoritesContext'; // Updated path
 
 const queryClient = new QueryClient();
 
@@ -15,16 +14,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <FavoritesProvider>
         <Router>
-          <nav className="navbar">
-            <div className="navbar-container">
-              <NavLink to="/" className="navbar-link" activeClassName="active-link">
-                <FaUsers className="navbar-icon" /> Characters
-              </NavLink>
-              <NavLink to="/favorites" className="navbar-link" activeClassName="active-link">
-                <FaHeart className="navbar-icon" /> Favorites
-              </NavLink>
-            </div>
-          </nav>
+          <Navbar /> {/* Use Navbar component */}
           <Routes>
             <Route path="/" element={<CharacterList />} />
             <Route path="/character/:id" element={<CharacterDetails />} />
