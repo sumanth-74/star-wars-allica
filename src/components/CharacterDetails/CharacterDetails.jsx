@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaEdit, FaSave, FaTimes } from 'react-icons/fa'; // Import icons
 import { useFavorites } from '../../contexts/FavoritesContext'; // Updated path
-import '../../App.css';
+import './CharacterDetails.css';
 
 const CharacterDetails = () => {
   const { id } = useParams();

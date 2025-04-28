@@ -1,0 +1,118 @@
+
+.character-details-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.character-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.character-details-header h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1d4ed8;
+}
+
+.character-details-header button {
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.character-details-header button:hover {
+  background-color: #0056b3;
+}
+
+.character-details-section {
+  margin-bottom: 1.5rem;
+}
+
+.character-details-section h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+
+.character-attribute {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.attribute-key {
+  font-weight: bold;
+  color: #555;
+  text-transform: capitalize;
+}
+
+.attribute-value {
+  color: #333;
+}
+
+.editable-attribute {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.editable-field {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.edit-input {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  width: 150px;
+  margin-right: 0.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.edit-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+.edit-icon,
+.save-icon,
+.cancel-icon {
+  font-size: 1.25rem;
+  color: #007bff;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.edit-icon:hover,
+.save-icon:hover,
+.cancel-icon:hover {
+  color: #0056b3;
+  transform: scale(1.1);
+}

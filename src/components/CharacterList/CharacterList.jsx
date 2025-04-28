@@ -6,7 +6,7 @@ import { useFavorites } from '../../contexts/FavoritesContext'; // Updated path
 import Shimmer from '../Shimmer/Shimmer'; // Updated path
 import Pagination from '../Pagination/Pagination'; // Updated path
 import SearchBar from '../SearchBar/SearchBar'; // Updated path
-import '../../App.css';
+import './CharacterList.css'; // Updated path
 
 const CharacterList = () => {
   const { characters, fetchAndCacheCharacter, loading } = useFavorites();

@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../App.css';
+import './Pagination.css'; // Import styles
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const handlePrevious = () => {
