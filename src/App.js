@@ -6,23 +6,29 @@ import CharacterDetails from './components/CharacterDetails/CharacterDetails'; /
 import Favorites from './components/Favorites/Favorites'; // Updated path
 import Navbar from './components/Navbar/Navbar'; // Updated path
 import FavoritesProvider from './contexts/FavoritesContext'; // Updated path
+import { ErrorProvider } from './contexts/ErrorContext'; // Import ErrorProvider
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary'; // Import ErrorBoundary
 
 const queryClient = new QueryClient();
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <FavoritesProvider>
-        <Router>
-          <Navbar /> {/* Use Navbar component */}
-          <Routes>
-            <Route path="/" element={<CharacterList />} />
-            <Route path="/character/:id" element={<CharacterDetails />} />
-            <Route path="/favorites" element={<Favorites />} />
-          </Routes>
-        </Router>
-      </FavoritesProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ErrorProvider>
+          <FavoritesProvider>
+            <Router>
+              <Navbar /> {/* Use Navbar component */}
+              <Routes>
+                <Route path="/" element={<CharacterList />} />
+                <Route path="/character/:id" element={<CharacterDetails />} />
+                <Route path="/favorites" element={<Favorites />} />
+              </Routes>
+            </Router>
+          </FavoritesProvider>
+        </ErrorProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 

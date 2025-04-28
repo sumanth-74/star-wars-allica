@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { fetchCharacters } from '../../services/api'; // Updated path
 import { useFavorites } from '../../contexts/FavoritesContext'; // Updated path
+import { useError } from '../../contexts/ErrorContext'; // Import useError
 import Shimmer from '../Shimmer/Shimmer'; // Updated path
 import Pagination from '../Pagination/Pagination'; // Updated path
 import SearchBar from '../SearchBar/SearchBar'; // Updated path
@@ -10,6 +11,7 @@ import './CharacterList.css'; // Updated path
 
 const CharacterList = () => {
   const { characters, fetchAndCacheCharacter, loading } = useFavorites();
+  const { showError } = useError(); // Use showError for error handling
   const [page, setPage] = useState(1);
   const [limit] = useState(12); // Default limit of 12 items per page
   const [search, setSearch] = useState('');
@@ -49,6 +51,12 @@ const CharacterList = () => {
 
     fetchAllDetails();
   }, [data, fetchAndCacheCharacter]);
+
+  useEffect(() => {
+    if (error) {
+      showError('Failed to load characters. Please try again later.');
+    }
+  }, [error, showError]);
 
   const handleSearchClick = (searchInput) => {
     setSearch(searchInput); // Trigger search with the input value

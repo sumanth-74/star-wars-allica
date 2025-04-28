@@ -5,6 +5,14 @@ const api = axios.create({
   timeout: 10000, // Set a timeout for requests
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', error);
+    return Promise.reject(error);
+  }
+);
+
 export const fetchCharacters = async (page, limit = 10, search = '') => {
   const searchParam = search ? `&name=${encodeURIComponent(search)}` : '';
   const response = await api.get(`/people/?page=${page}&limit=${limit}${searchParam}`);
