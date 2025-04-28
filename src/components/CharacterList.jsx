@@ -28,8 +28,6 @@ const CharacterList = () => {
               console.error('Invalid character URL:', char);
               return;
             }
-
-            console.log('Fetching character details for:', char.name);
             await fetchAndCacheCharacter(char.url); // Fetch and cache character and planet details
           })
         );

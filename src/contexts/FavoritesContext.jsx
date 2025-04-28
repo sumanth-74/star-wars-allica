@@ -12,8 +12,9 @@ export const useFavorites = () => {
 export const FavoritesProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
   const [characters, setCharacters] = useState({}); // Cache for characters
-  const [planets, setPlanets] = useState({}); // Cache for planets
-  const [ongoingRequests, setOngoingRequests] = useState(new Set()); // Track ongoing API calls
+  const [planetsCache, setPlanetsCache] = useState({}); // Persistent cache for planets
+  const ongoingPlanetRequests = new Map(); // Track ongoing planet requests
+  const [ongoingRequests, setOngoingRequests] = useState(new Set()); // Track ongoing character API calls
 
   const addFavorite = useCallback((character) => {
     setFavorites((prev) => [
@@ -43,13 +44,6 @@ export const FavoritesProvider = ({ children }) => {
     }));
   }, []);
 
-  const addPlanet = useCallback((url, name) => {
-    setPlanets((prev) => ({
-      ...prev,
-      [url]: name,
-    }));
-  }, []);
-
   const fetchAndCacheCharacter = useCallback(
     async (charUrl) => {
       if (!charUrl) {
@@ -74,18 +68,35 @@ export const FavoritesProvider = ({ children }) => {
         const details = await fetchCharacter(charId);
 
         // Extract homeworld URL from details
-        const homeworldUrl = details.result.properties.homeworld;
+        const homeworldUrl = details.result.properties.homeworld
 
-        // Fetch planet details if not cached
-        let homeworldName = planets[homeworldUrl];
-        if (homeworldUrl && !homeworldName) {
-          try {
-            const planetDetails = await fetchPlanet(homeworldUrl);
-            homeworldName = planetDetails.result.properties.name;
-            addPlanet(homeworldUrl, homeworldName);
-          } catch (error) {
-            console.error(`Failed to fetch planet details for ${homeworldUrl}:`, error);
-            homeworldName = 'unknown'; // Fallback to 'unknown' if the API call fails
+        // Check if the planet is already cached
+        let homeworldName = planetsCache[homeworldUrl];
+        if (homeworldName) {
+          console.log(`Using cached planet details for ${homeworldUrl}`);
+        } else if (homeworldUrl) {
+          // Check if a request for this planet is already in progress
+          if (ongoingPlanetRequests.has(homeworldUrl)) {
+            homeworldName = await ongoingPlanetRequests.get(homeworldUrl); // Wait for the ongoing request to complete
+          } else {
+            try {
+              console.log(`Fetching planet details for ${homeworldUrl}`);
+              const planetPromise = fetchPlanet(homeworldUrl).then((planetDetails) => {
+                const name = planetDetails.result.properties.name;
+                setPlanetsCache((prev) => ({
+                  ...prev,
+                  [homeworldUrl]: name, // Update the cache
+                }));
+                ongoingPlanetRequests.delete(homeworldUrl); // Remove from ongoing requests
+                return name;
+              });
+              ongoingPlanetRequests.set(homeworldUrl, planetPromise); // Track the ongoing request
+              homeworldName = await planetPromise; // Wait for the request to complete
+            } catch (error) {
+              console.error(`Failed to fetch planet details for ${homeworldUrl}:`, error);
+              homeworldName = 'unknown'; // Fallback to 'unknown' if the API call fails
+              ongoingPlanetRequests.delete(homeworldUrl); // Remove from ongoing requests
+            }
           }
         }
 
@@ -112,7 +123,7 @@ export const FavoritesProvider = ({ children }) => {
         });
       }
     },
-    [characters, planets, addCharacter, addPlanet, ongoingRequests]
+    [characters, ongoingRequests, planetsCache, ongoingPlanetRequests, addCharacter]
   );
 
   return (
@@ -120,12 +131,10 @@ export const FavoritesProvider = ({ children }) => {
       value={{
         favorites,
         characters,
-        planets,
         addFavorite,
         removeFavorite,
         updateCharacter,
         addCharacter,
-        addPlanet,
         fetchAndCacheCharacter, // Expose the new function
       }}
     >
