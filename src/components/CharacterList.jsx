@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { fetchCharacters, fetchCharacter, fetchPlanet } from '../services/api';
+import { fetchCharacters } from '../services/api';
+import { useFavorites } from '../contexts/FavoritesContext';
 import Shimmer from './Shimmer'; // Import Shimmer component
 import '../App.css'; // Import styles
 
 const CharacterList = () => {
+  const { characters, fetchAndCacheCharacter } = useFavorites();
   const [page, setPage] = useState(1);
   const [limit] = useState(10); // Default limit of 10 items per page
   const [search, setSearch] = useState('');
-  const [characters, setCharacters] = useState([]);
-  const [loadingDetails, setLoadingDetails] = useState(false); // Track loading state for details and planet APIs
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['characters', page, limit, search],
@@ -20,37 +20,24 @@ const CharacterList = () => {
   });
 
   useEffect(() => {
-    const fetchCharacterDetails = async () => {
+    const fetchAllDetails = async () => {
       if (data?.results) {
-        setLoadingDetails(true); // Start loading details
-        const detailedCharacters = await Promise.all(
+        await Promise.all(
           data.results.map(async (char) => {
-            try {
-              // Extract charId from char.url
-              const charId = char.url.split('/').filter(Boolean).pop();
-
-              const details = await fetchCharacter(charId); // Fetch character details
-              const homeworldDetails = await fetchPlanet(details.result.properties.homeworld); // Fetch homeworld details
-              return {
-                uid: char.uid, // Use uid as the unique identifier
-                name: char.name,
-                gender: details.result.properties.gender,
-                homeworld: homeworldDetails.result.properties.name, // Extract planet name
-                url: char.url, // Pass the URL for consistent navigation
-              };
-            } catch (error) {
-              console.error(`Failed to fetch details for ${char.name}:`, error);
-              return null; // Skip this character if fetching fails
+            if (!char.url) {
+              console.error('Invalid character URL:', char);
+              return;
             }
+
+            console.log('Fetching character details for:', char.name);
+            await fetchAndCacheCharacter(char.url); // Fetch and cache character and planet details
           })
         );
-        setCharacters(detailedCharacters.filter((char) => char !== null)); // Filter out failed fetches
-        setLoadingDetails(false); // Stop loading details
       }
     };
 
-    fetchCharacterDetails();
-  }, [data]);
+    fetchAllDetails();
+  }, [data, fetchAndCacheCharacter]);
 
   const handleSearchClick = (searchInput) => {
     setSearch(searchInput); // Trigger search with the input value
@@ -69,8 +56,7 @@ const CharacterList = () => {
     }
   };
 
-  // Show shimmer UI if either the characters API or details/planet APIs are still loading
-  if (isLoading || loadingDetails) {
+  if (isLoading) {
     return (
       <div className="container">
         <h1 className="title">Star Wars Characters</h1>
@@ -81,12 +67,15 @@ const CharacterList = () => {
 
   if (error) return <div>Error loading characters</div>;
 
+  const characterUrls = data?.results.map((char) => char.url) || [];
+  const characterList = characterUrls.map((url) => characters[url]).filter(Boolean);
+
   return (
     <div className="container">
       <h1 className="title">Star Wars Characters</h1>
       <SearchBar onSearch={handleSearchClick} />
       <div className="character-list">
-        {characters.map((char) => (
+        {characterList.map((char) => (
           <Link key={char.uid} to={`/character/${char.uid}`} className="character-card">
             <h3 className="character-name">{char.name}</h3>
             <p className="character-detail">Gender: {char.gender || 'unknown'}</p>

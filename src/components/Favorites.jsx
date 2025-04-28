@@ -1,27 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useFavorites } from '../contexts/FavoritesContext';
-import { fetchPlanet } from '../services/api';
 import '../App.css'; // Ensure this import is correct
 
 const Favorites = () => {
-  const { favorites, removeFavorite, updateCharacter } = useFavorites();
-
-  useEffect(() => {
-    const fetchHomeworldNames = async () => {
-      for (const char of favorites) {
-        if (char.homeworld && !char.homeworldName) {
-          try {
-            const planetDetails = await fetchPlanet(char.homeworld);
-            updateCharacter(char.url, { homeworldName: planetDetails.result.properties.name });
-          } catch (error) {
-            console.error(`Failed to fetch homeworld for ${char.name}:`, error);
-          }
-        }
-      }
-    };
-
-    fetchHomeworldNames();
-  }, [favorites, updateCharacter]);
+  const { favorites, removeFavorite } = useFavorites();
 
   if (favorites.length === 0) {
     return <div className="container"><h1>No favorites added yet!</h1></div>;
@@ -37,7 +19,7 @@ const Favorites = () => {
             <p className="character-detail">Height: {char.height || 'unknown'}</p>
             <p className="character-detail">Gender: {char.gender || 'unknown'}</p>
             <p className="character-detail">
-              Homeworld: {char.homeworldName || 'Loading...'}
+              Homeworld: {char.homeworld || 'unknown'}
             </p>
             <button
               onClick={() => {

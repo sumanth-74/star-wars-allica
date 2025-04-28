@@ -1,71 +1,46 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FaEdit } from 'react-icons/fa'; // Import edit icon
-import { fetchCharacter, fetchPlanet } from '../services/api';
 import { useFavorites } from '../contexts/FavoritesContext';
 import '../App.css'; // Import styles
 
 const CharacterDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient(); // Access react-query's query client
-  const { updateCharacter, addFavorite, favorites } = useFavorites();
+  const { characters, updateCharacter, addFavorite, favorites } = useFavorites();
 
-  const [editingField, setEditingField] = useState(null);
-  const [fieldValue, setFieldValue] = useState('');
+  // Ensure the characterUrl matches the keys in the characters cache
+  const characterUrl = `https://www.swapi.tech/api/people/${id}`;
+  console.log('Characters cache:', characters); // Debugging log
+  console.log('Character URL:', characterUrl); // Debugging log
 
-  const { data: character, isLoading: isCharacterLoading } = useQuery({
-    queryKey: ['character', id],
-    queryFn: () => fetchCharacter(id),
-    staleTime: 5 * 60 * 1000, // Cache data for 5 minutes
-  });
+  const character = characters[characterUrl];
+  const isFavorite = favorites.some((fav) => fav.url === characterUrl);
 
-  const { data: homeworld, isLoading: isHomeworldLoading } = useQuery({
-    queryKey: ['planet', character?.result.properties.homeworld],
-    queryFn: () => fetchPlanet(character?.result.properties.homeworld),
-    enabled: !!character?.result.properties.homeworld,
-    staleTime: 5 * 60 * 1000, // Cache data for 5 minutes
-  });
-
-  const isFavorite = favorites.some((fav) => fav.url === `https://swapi.tech/api/people/${id}`);
+  const [editingField, setEditingField] = React.useState(null); // Track the field being edited
+  const [fieldValue, setFieldValue] = React.useState(''); // Track the value of the field being edited
 
   const handleEdit = (field) => {
     setEditingField(field);
-    setFieldValue(character?.result.properties[field] || ''); // Ensure the input is always controlled
+    setFieldValue(character[field] || ''); // Set the initial value of the field being edited
   };
 
   const handleSave = () => {
-    const updatedCharacter = {
-      ...character.result.properties,
-      [editingField]: fieldValue,
-    };
-
-    // Update the global state
-    updateCharacter(`https://swapi.tech/api/people/${id}`, { [editingField]: fieldValue });
-
-    // Update the react-query cache
-    queryClient.setQueryData(['character', id], (prev) => ({
-      ...prev,
-      result: {
-        ...prev.result,
-        properties: updatedCharacter,
-      },
-    }));
-
+    updateCharacter(character.url, { [editingField]: fieldValue }); // Update the character in the context
     setEditingField(null); // Exit editing mode
   };
 
-  if (isCharacterLoading || isHomeworldLoading) return <div>Loading...</div>;
-  if (!character) return <div>Error loading character details</div>;
-
-  const properties = character.result.properties;
+  if (!character) {
+    return <div>Character details not found.</div>; // Handle missing character details
+  }
 
   return (
     <div className="character-details-container">
       <div className="character-details-header">
-        <h1>{properties.name}</h1>
-        <button onClick={() => navigate(-1)} className="back-button">Back</button>
+        <h1>{character.name}</h1>
+        <button onClick={() => navigate(-1)} className="back-button">
+          Back
+        </button>
       </div>
       <div className="character-details-section">
         <h2>Basic Information</h2>
@@ -79,7 +54,7 @@ const CharacterDetails = () => {
               className="edit-input"
             />
           ) : (
-            <span>{properties.height || 'unknown'}</span>
+            <span>{character.height || 'unknown'}</span>
           )}
           <FaEdit
             className="edit-icon"
@@ -97,7 +72,7 @@ const CharacterDetails = () => {
               className="edit-input"
             />
           ) : (
-            <span>{properties.gender || 'unknown'}</span>
+            <span>{character.gender || 'unknown'}</span>
           )}
           <FaEdit
             className="edit-icon"
@@ -105,11 +80,11 @@ const CharacterDetails = () => {
             title="Edit Gender"
           />
         </div>
-        <p>Homeworld: {homeworld?.result.properties.name || 'unknown'}</p>
+        <p>Homeworld: {character.homeworld || 'unknown'}</p>
       </div>
       <div className="add-to-favorites-container">
         <button
-          onClick={() => addFavorite({ ...properties, url: `https://swapi.tech/api/people/${id}` })}
+          onClick={() => addFavorite(character)}
           disabled={isFavorite}
           className="add-to-favorites-button"
         >
@@ -118,8 +93,12 @@ const CharacterDetails = () => {
       </div>
       {editingField && (
         <div className="edit-actions">
-          <button onClick={handleSave} className="save-button">Save</button>
-          <button onClick={() => setEditingField(null)} className="cancel-button">Cancel</button>
+          <button onClick={handleSave} className="save-button">
+            Save
+          </button>
+          <button onClick={() => setEditingField(null)} className="cancel-button">
+            Cancel
+          </button>
         </div>
       )}
     </div>
