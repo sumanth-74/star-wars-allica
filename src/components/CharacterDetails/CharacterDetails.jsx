@@ -1,43 +1,75 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaEdit, FaSave, FaTimes } from 'react-icons/fa'; // Import icons
-import { useFavorites } from '../../contexts/FavoritesContext'; // Updated path
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FaEdit, FaSave, FaTimes } from 'react-icons/fa';
+import { useFavorites } from '../../contexts/FavoritesContext';
+import { fetchCharacter, fetchPlanet } from '../../services/api';
 import './CharacterDetails.css';
 
 const CharacterDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { characters, updateCharacter, addFavorite, favorites } = useFavorites();
+  const queryClient = useQueryClient();
+  const { updateCharacter, addFavorite, favorites } = useFavorites();
 
-  // Ensure the characterUrl matches the keys in the characters cache
   const characterUrl = `https://www.swapi.tech/api/people/${id}`;
-  const character = characters[characterUrl];
   const isFavorite = favorites.some((fav) => fav.url === characterUrl);
 
-  const [editingField, setEditingField] = React.useState(null); // Track the field being edited
-  const [fieldValue, setFieldValue] = React.useState(''); // Track the value of the field being edited
+  const [editingField, setEditingField] = React.useState(null);
+  const [fieldValue, setFieldValue] = React.useState('');
+
+  // Fetch character details
+  const { data: characterDetails, isLoading: isLoadingCharacter } = useQuery({
+    queryKey: ['character', id],
+    queryFn: () => fetchCharacter(id),
+    staleTime: Infinity,
+  });
+
+  // Fetch homeworld details if available
+  const homeworldUrl = characterDetails?.result.properties.homeworld;
+  const { data: planet, isLoading: isLoadingPlanet } = useQuery({
+    queryKey: ['planet', homeworldUrl],
+    queryFn: async () => {
+      const planetDetails = await fetchPlanet(homeworldUrl);
+      return {
+        url: homeworldUrl,
+        name: planetDetails.result.properties.name || 'unknown',
+      };
+    },
+    staleTime: Infinity,
+    enabled: !!homeworldUrl,
+  });
+
+  // Combine character and homeworld data
+  const character = characterDetails
+    ? {
+        ...characterDetails.result.properties,
+        uid: id,
+        homeworld: planet?.name || 'unknown',
+        url: characterUrl,
+      }
+    : null;
 
   const handleEdit = (field) => {
     setEditingField(field);
-    setFieldValue(character[field] || ''); // Set the initial value of the field being edited
+    setFieldValue(character[field] || '');
   };
 
   const handleSave = () => {
-    updateCharacter(character.url, { [editingField]: fieldValue }); // Update the character in the context
-    setEditingField(null); // Exit editing mode
+    updateCharacter(queryClient, character.url, { [editingField]: fieldValue });
+    setEditingField(null);
   };
 
   const handleCancel = () => {
-    setEditingField(null); // Exit editing mode without saving
+    setEditingField(null);
   };
 
-  if (!character) {
-    return <div>Character details not found.</div>; // Handle missing character details
-  }
+  if (isLoadingCharacter || isLoadingPlanet) return <div>Loading character details...</div>;
+  if (!character) return <div>Character details not found.</div>;
 
   const renderCharacterAttributes = () => {
     const attributes = Object.entries(character).filter(
-      ([key]) => !['url', 'uid', 'name', 'height', 'gender', 'homeworld'].includes(key) // Exclude already displayed fields
+      ([key]) => !['url', 'uid', 'name', 'height', 'gender', 'homeworld'].includes(key)
     );
 
     return attributes.map(([key, value]) => (
@@ -139,7 +171,7 @@ const CharacterDetails = () => {
           disabled={isFavorite}
           className="add-to-favorites-button"
         >
-          {isFavorite ? 'Already in Favorites' : 'Add to Favorites'}
+          {isFavorite ? 'View Favorites' : 'Add to Favorites'}
         </button>
       </div>
     </div>

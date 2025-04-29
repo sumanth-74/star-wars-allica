@@ -1,30 +1,34 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: 'https://swapi.tech/api',
-  timeout: 10000, // Set a timeout for requests
-});
-
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('API Error:', error);
-    return Promise.reject(error);
+export const fetchCharacter = async (uid) => {
+  const response = await fetch(`https://www.swapi.tech/api/people/${uid}`);
+  console.log('response', response);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch character ${uid}: ${response.status} ${response.statusText}`);
   }
-);
-
-export const fetchCharacters = async (page, limit = 10, search = '') => {
-  const searchParam = search ? `&name=${encodeURIComponent(search)}` : '';
-  const response = await api.get(`/people/?page=${page}&limit=${limit}${searchParam}`);
-  return response.data;
+  const data = await response.json();
+  if (!data.result) {
+    throw new Error(`Invalid response for character ${uid}: Missing result`);
+  }
+  return data;
 };
 
-export const fetchCharacter = async (charId) => {
-  const response = await api.get(`/people/${charId}`);
-  return response.data;
+export const fetchPlanet = async (url) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch planet ${url}: ${response.status} ${response.statusText}`);
+  }
+  const data = await response.json();
+  if (!data.result) {
+    throw new Error(`Invalid response for planet ${url}: Missing result`);
+  }
+  return data;
 };
 
-export const fetchPlanet = async (planetUrl) => {
-  const response = await axios.get(planetUrl); // Use axios directly for external URLs
-  return response.data;
+export const fetchCharacters = async (page, limit, search) => {
+  const params = new URLSearchParams({ page, limit });
+  if (search) params.append('name', search);
+  const response = await fetch(`https://www.swapi.tech/api/people?${params}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch characters: ${response.status} ${response.statusText}`);
+  }
+  return response.json();
 };
