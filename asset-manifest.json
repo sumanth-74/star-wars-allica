@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/star-wars-allica/static/css/main.2baa9667.css",
+    "main.js": "/star-wars-allica/static/js/main.1fbadb68.js",
+    "index.html": "/star-wars-allica/index.html",
+    "main.2baa9667.css.map": "/star-wars-allica/static/css/main.2baa9667.css.map",
+    "main.1fbadb68.js.map": "/star-wars-allica/static/js/main.1fbadb68.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2baa9667.css",
+    "static/js/main.1fbadb68.js"
+  ]
+}
