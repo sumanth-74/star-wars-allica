@@ -95,31 +95,14 @@ const CharacterDetails = () => {
           <div className="editable-field">
             {editingField === 'height' ? (
               <>
-                <input
-                  type="text"
-                  value={fieldValue}
-                  onChange={(e) => setFieldValue(e.target.value)}
-                  className="edit-input"
-                />
-                <FaSave
-                  className="save-icon"
-                  onClick={handleSave}
-                  title="Save Height"
-                />
-                <FaTimes
-                  className="cancel-icon"
-                  onClick={handleCancel}
-                  title="Cancel Edit"
-                />
+                <input className="edit-input" type="text" value={fieldValue} onChange={(e) => setFieldValue(e.target.value)}/>
+                <FaSave className="save-icon" onClick={handleSave} title="Save Height" />
+                <FaTimes className="cancel-icon" onClick={handleCancel} title="Cancel Edit" />
               </>
             ) : (
               <>
                 <span className="attribute-value">{character.height || 'unknown'}</span>
-                <FaEdit
-                  className="edit-icon"
-                  onClick={() => handleEdit('height')}
-                  title="Edit Height"
-                />
+                <FaEdit className="edit-icon" onClick={() => handleEdit('height')} title="Edit Height" />
               </>
             )}
           </div>
@@ -129,31 +112,14 @@ const CharacterDetails = () => {
           <div className="editable-field">
             {editingField === 'gender' ? (
               <>
-                <input
-                  type="text"
-                  value={fieldValue}
-                  onChange={(e) => setFieldValue(e.target.value)}
-                  className="edit-input"
-                />
-                <FaSave
-                  className="save-icon"
-                  onClick={handleSave}
-                  title="Save Gender"
-                />
-                <FaTimes
-                  className="cancel-icon"
-                  onClick={handleCancel}
-                  title="Cancel Edit"
-                />
+                 <input className="edit-input" type="text" value={fieldValue} onChange={(e) => setFieldValue(e.target.value)}/>
+                 <FaSave className="save-icon" onClick={handleSave} title="Save Gender" />
+                 <FaTimes className="cancel-icon" onClick={handleCancel} title="Cancel Edit" />
               </>
             ) : (
               <>
                 <span className="attribute-value">{character.gender || 'unknown'}</span>
-                <FaEdit
-                  className="edit-icon"
-                  onClick={() => handleEdit('gender')}
-                  title="Edit Gender"
-                />
+                <FaEdit className="edit-icon" onClick={() => handleEdit('gender')} title="Edit Gender" />
               </>
             )}
           </div>

@@ -53,9 +53,9 @@
   align-items: center;
   padding: 0.5rem 1rem;
   margin-bottom: 0.5rem;
-  background-color: #f8f9fa;
+  background-color: #dce2ee;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .attribute-key {
@@ -74,9 +74,9 @@
   align-items: center;
   padding: 0.5rem 1rem;
   margin-bottom: 0.5rem;
-  background-color: #f8f9fa;
+  background-color: #dce2ee;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .editable-field {
