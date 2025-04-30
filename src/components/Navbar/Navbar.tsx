@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FaHeart, FaUsers } from 'react-icons/fa';
+import { Group, Favorite } from '@mui/icons-material';
 import './Navbar.css';
 
 // Component
@@ -19,13 +19,13 @@ const Navbar: React.FC = () => {
           to="/"
           className={({ isActive }) => `navbar-link ${isActive ? 'active-link' : ''}`}
         >
-          <FaUsers className="navbar-icon" /> Characters
+          <Group className="navbar-icon" /> Characters
         </NavLink>
         <NavLink
           to="/favorites"
           className={({ isActive }) => `navbar-link ${isActive ? 'active-link' : ''}`}
         >
-          <FaHeart className="navbar-icon" /> Favorites
+          <Favorite className="navbar-icon" /> Favorites
         </NavLink>
       </div>
     </nav>

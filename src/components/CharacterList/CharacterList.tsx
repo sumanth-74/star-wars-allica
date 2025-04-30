@@ -215,11 +215,13 @@ const CharacterList: React.FC = () => {
       <div className="character-list">
         {combinedCharacterList.length > 0 ? (
           combinedCharacterList.map((char) => (
-            <Link key={char.uid} to={`/character/${char.uid}`} className="character-card">
-              <h3 className="character-name">{char.name}</h3>
-              <p className="character-detail">Gender: {char.gender || 'unknown'}</p>
-              <p className="character-detail">Homeworld: {char.homeworld || 'unknown'}</p>
-            </Link>
+            char && (
+              <Link key={char.uid} to={`/character/${char.uid}`} className="character-card">
+                <h3 className="character-name">{char.name}</h3>
+                <p className="character-detail">Gender: {char.gender || 'unknown'}</p>
+                <p className="character-detail">Homeworld: {char.homeworld || 'unknown'}</p>
+              </Link>
+            )
           ))
         ) : (
           <div className="no-results-container">

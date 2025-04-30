@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { FaEdit, FaSave, FaTimes } from 'react-icons/fa';
+import { Save, Cancel, Edit } from '@mui/icons-material';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { fetchCharacter, fetchPlanet } from '../../services/api';
 import './CharacterDetails.css';
@@ -122,13 +122,13 @@ const CharacterDetails: React.FC = () => {
                   value={fieldValue}
                   onChange={(e) => setFieldValue(e.target.value)}
                 />
-                <FaSave className="save-icon" onClick={handleSave} title="Save Height" />
-                <FaTimes className="cancel-icon" onClick={handleCancel} title="Cancel Edit" />
+                <Save className="save-icon" onClick={handleSave} titleAccess="Save Height"/>
+                <Cancel className="cancel-icon" onClick={handleCancel} titleAccess="Cancel Edit"/>
               </>
             ) : (
               <>
                 <span className="attribute-value">{character.height || 'unknown'}</span>
-                <FaEdit className="edit-icon" onClick={() => handleEdit('height')} title="Edit Height" />
+                <Edit className="edit-icon" onClick={() => handleEdit('height')} titleAccess="Edit Height" />
               </>
             )}
           </div>
@@ -144,13 +144,13 @@ const CharacterDetails: React.FC = () => {
                   value={fieldValue}
                   onChange={(e) => setFieldValue(e.target.value)}
                 />
-                <FaSave className="save-icon" onClick={handleSave} title="Save Gender" />
-                <FaTimes className="cancel-icon" onClick={handleCancel} title="Cancel Edit" />
+                <Save className="save-icon" onClick={handleSave} titleAccess="Save Gender"/>
+                <Cancel className="cancel-icon" onClick={handleCancel} titleAccess="Cancel Edit"/>
               </>
             ) : (
               <>
                 <span className="attribute-value">{character.gender || 'unknown'}</span>
-                <FaEdit className="edit-icon" onClick={() => handleEdit('gender')} title="Edit Gender" />
+                <Edit className="edit-icon" onClick={() => handleEdit('gender')} titleAccess="Edit Gender" />
               </>
             )}
           </div>

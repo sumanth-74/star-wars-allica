@@ -2,7 +2,12 @@
   "name": "star-wars",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://sumanth-74.github.io/star-wars-allica",
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
     "@tanstack/react-query": "^5.74.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -20,7 +25,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -44,6 +51,7 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@types/react-router-dom": "^5.3.3",
+    "gh-pages": "^6.3.0",
     "typescript": "^4.9.5"
   }
 }
