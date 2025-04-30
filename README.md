@@ -2,6 +2,12 @@
 
 This project is a Star Wars web application that allows users to explore characters, view their details, and manage their favorite characters. The application is built using React and leverages modern libraries like `react-query` for data fetching and caching.
 
+## Screenshots
+![Screenshot 2025-05-01 at 12 00 26 AM](https://github.com/user-attachments/assets/f5289f80-7fff-4868-8f34-39210bad658d)
+![Screenshot 2025-05-01 at 12 00 52 AM](https://github.com/user-attachments/assets/7afbddb2-d635-4009-b5e4-fda47cabf78f)
+![Screenshot 2025-05-01 at 12 01 19 AM](https://github.com/user-attachments/assets/24cbc80d-57fb-45e1-904e-e830be943cac)
+
+
 ## Features
 
 ### 1. Character List
@@ -15,6 +21,8 @@ This project is a Star Wars web application that allows users to explore charact
 - Allows editing of specific fields like height and gender.
 - Fetches and displays the character's homeworld details.
 - Provides an option to add the character to the favorites list.
+
+Note: Couldn't implement the films and starship details as the api response didn't have any information related to them.
 
 ### 3. Favorites
 - Displays a list of favorite characters added by the user.
