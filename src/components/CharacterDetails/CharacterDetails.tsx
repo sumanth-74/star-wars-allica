@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FaEdit, FaSave, FaTimes } from 'react-icons/fa';
@@ -6,8 +6,28 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 import { fetchCharacter, fetchPlanet } from '../../services/api';
 import './CharacterDetails.css';
 
-const CharacterDetails = () => {
-  const { id } = useParams();
+interface Character {
+  name: string;
+  height: string;
+  gender: string;
+  homeworld: string;
+  [key: string]: string ;
+}
+
+interface CharacterDetailsResponse {
+  result: {
+    properties: {
+      name: string;
+      height: string;
+      gender: string;
+      homeworld: string;
+      [key: string]: string | undefined;
+    };
+  };
+}
+
+const CharacterDetails: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { updateCharacter, addFavorite, favorites } = useFavorites();
@@ -15,13 +35,13 @@ const CharacterDetails = () => {
   const characterUrl = `https://www.swapi.tech/api/people/${id}`;
   const isFavorite = favorites.some((fav) => fav.url === characterUrl);
 
-  const [editingField, setEditingField] = React.useState(null);
-  const [fieldValue, setFieldValue] = React.useState('');
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [fieldValue, setFieldValue] = useState<string>('');
 
   // Fetch character details
-  const { data: characterDetails, isLoading: isLoadingCharacter } = useQuery({
+  const { data: characterDetails, isLoading: isLoadingCharacter } = useQuery<CharacterDetailsResponse>({
     queryKey: ['character', id],
-    queryFn: () => fetchCharacter(id),
+    queryFn: () => fetchCharacter(id!),
     staleTime: Infinity,
   });
 
@@ -30,7 +50,7 @@ const CharacterDetails = () => {
   const { data: planet, isLoading: isLoadingPlanet } = useQuery({
     queryKey: ['planet', homeworldUrl],
     queryFn: async () => {
-      const planetDetails = await fetchPlanet(homeworldUrl);
+      const planetDetails = await fetchPlanet(homeworldUrl!);
       return {
         url: homeworldUrl,
         name: planetDetails.result.properties.name || 'unknown',
@@ -41,23 +61,24 @@ const CharacterDetails = () => {
   });
 
   // Combine character and homeworld data
-  const character = characterDetails
+  const character: Character | null = characterDetails
     ? {
         ...characterDetails.result.properties,
-        uid: id,
         homeworld: planet?.name || 'unknown',
         url: characterUrl,
       }
     : null;
 
-  const handleEdit = (field) => {
+  const handleEdit = (field: string) => {
     setEditingField(field);
-    setFieldValue(character[field] || '');
+    setFieldValue(character?.[field] || '');
   };
 
   const handleSave = () => {
-    updateCharacter(queryClient, character.url, { [editingField]: fieldValue });
-    setEditingField(null);
+    if (character) {
+      updateCharacter(queryClient, character.url, { [editingField!]: fieldValue });
+      setEditingField(null);
+    }
   };
 
   const handleCancel = () => {
@@ -95,7 +116,12 @@ const CharacterDetails = () => {
           <div className="editable-field">
             {editingField === 'height' ? (
               <>
-                <input className="edit-input" type="text" value={fieldValue} onChange={(e) => setFieldValue(e.target.value)}/>
+                <input
+                  className="edit-input"
+                  type="text"
+                  value={fieldValue}
+                  onChange={(e) => setFieldValue(e.target.value)}
+                />
                 <FaSave className="save-icon" onClick={handleSave} title="Save Height" />
                 <FaTimes className="cancel-icon" onClick={handleCancel} title="Cancel Edit" />
               </>
@@ -112,9 +138,14 @@ const CharacterDetails = () => {
           <div className="editable-field">
             {editingField === 'gender' ? (
               <>
-                 <input className="edit-input" type="text" value={fieldValue} onChange={(e) => setFieldValue(e.target.value)}/>
-                 <FaSave className="save-icon" onClick={handleSave} title="Save Gender" />
-                 <FaTimes className="cancel-icon" onClick={handleCancel} title="Cancel Edit" />
+                <input
+                  className="edit-input"
+                  type="text"
+                  value={fieldValue}
+                  onChange={(e) => setFieldValue(e.target.value)}
+                />
+                <FaSave className="save-icon" onClick={handleSave} title="Save Gender" />
+                <FaTimes className="cancel-icon" onClick={handleCancel} title="Cancel Edit" />
               </>
             ) : (
               <>

@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import './SearchBar.css'; // Import styles
 
-const SearchBar = ({ onSearch }) => {
-  const [searchInput, setSearchInput] = useState('');
+interface SearchBarProps {
+  onSearch: (query: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+  const [searchInput, setSearchInput] = useState<string>('');
 
   const handleSearch = () => {
     onSearch(searchInput);

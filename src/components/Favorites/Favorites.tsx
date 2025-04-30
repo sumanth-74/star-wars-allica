@@ -2,7 +2,7 @@ import React from 'react';
 import { useFavorites } from '../../contexts/FavoritesContext'; // Updated path
 import './Favorites.css'; // Import styles
 
-const Favorites = () => {
+const Favorites: React.FC = () => {
   const { favorites, removeFavorite } = useFavorites();
 
   if (favorites.length === 0) {
@@ -23,7 +23,9 @@ const Favorites = () => {
             </p>
             <button
               onClick={() => {
-                removeFavorite(char.url); // Remove character from favorites
+                if (char.url) {
+                  removeFavorite(char.url); // Remove character from favorites
+                }
               }}
               className="remove-button"
             >
