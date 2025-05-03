@@ -212,32 +212,44 @@ const CharacterList: React.FC = () => {
     <div className="container">
       <h1 className="title">Star Wars Characters</h1>
       <SearchBar onSearch={handleSearchClick} />
-      <div className="character-list">
-        {combinedCharacterList.length > 0 ? (
-          combinedCharacterList.map((char) => (
-            char && (
-              <Link key={char.uid} to={`/character/${char.uid}`} className="character-card">
-                <h3 className="character-name">{char.name}</h3>
-                <p className="character-detail">Gender: {char.gender || 'unknown'}</p>
-                <p className="character-detail">Homeworld: {char.homeworld || 'unknown'}</p>
-              </Link>
-            )
-          ))
-        ) : (
-          <div className="no-results-container">
-            <p className="no-results">No characters found.</p>
-            <button onClick={handleBackClick} className="back-button">
-              Back
-            </button>
+      {isFetchingCharacters ? (
+        <div className="shimmer-container">
+          <Shimmer count={12} />
+        </div>
+      ) : (
+        <>
+          <div className="character-list">
+            {combinedCharacterList.length > 0 ? (
+              combinedCharacterList.map((char) => (
+                char && (
+                  <Link key={char.uid} to={`/character/${char.uid}`} className="character-card">
+                    <h3 className="character-name">{char.name}</h3>
+                    <p className="character-detail">Gender: {char.gender || 'unknown'}</p>
+                    <p className="character-detail">Homeworld: {char.homeworld || 'unknown'}</p>
+                  </Link>
+                )
+              ))
+            ) : (
+              <div className="no-results-container">
+                <p className="no-results">No characters found.</p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      {!search && (
-        <Pagination
-          currentPage={page}
-          totalPages={search ? 1 : data?.total_pages ?? 1}
-          onPageChange={handlePageChange}
-        />
+          {search && (
+            <div className="back-button-container">
+              <button onClick={handleBackClick} className="back-button">
+                Back
+              </button>
+            </div>
+          )}
+          {!search && (
+            <Pagination
+              currentPage={page}
+              totalPages={search ? 1 : data?.total_pages ?? 1}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </>
       )}
     </div>
   );

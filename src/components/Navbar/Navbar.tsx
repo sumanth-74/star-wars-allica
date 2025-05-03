@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 import { Group, Favorite } from '@mui/icons-material';
 import './Navbar.css';
 
-// Component
 const Navbar: React.FC = () => {
   return (
     <nav className="navbar">

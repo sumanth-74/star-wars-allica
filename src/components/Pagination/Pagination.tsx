@@ -1,5 +1,5 @@
 import React from 'react';
-import './Pagination.css'; // Import styles
+import './Pagination.css';
 
 interface PaginationProps {
   currentPage: number;

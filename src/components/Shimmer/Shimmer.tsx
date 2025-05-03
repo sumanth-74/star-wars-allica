@@ -1,5 +1,5 @@
 import React from 'react';
-import './Shimmer.css'; // Import styles
+import './Shimmer.css';
 
 const Shimmer = ({ count = 12 }) => {
   const shimmerItems = Array.from({ length: count });

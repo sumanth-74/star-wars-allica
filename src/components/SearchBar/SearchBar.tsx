@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './SearchBar.css'; // Import styles
+import './SearchBar.css';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -10,6 +10,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
   const handleSearch = () => {
     onSearch(searchInput);
+    setSearchInput(''); // Clear the search input after search
   };
 
   return (
