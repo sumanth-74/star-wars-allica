@@ -12,6 +12,7 @@ import {
   CharacterProperties,
 } from '../../services/api';
 import { useError } from '../../contexts/ErrorContext';
+import { useSearch } from '../../contexts/SearchContext';
 import Shimmer from '../Shimmer/Shimmer';
 import Pagination from '../Pagination/Pagination';
 import SearchBar from '../SearchBar/SearchBar';
@@ -49,16 +50,16 @@ interface ErrorContextType {
 // Component
 const CharacterList: React.FC = () => {
   const { showError } = useError() as ErrorContextType;
+  const { searchQuery, setSearchQuery } = useSearch();
   const [page, setPage] = useState<number>(1);
   const [limit] = useState<number>(12);
-  const [search, setSearch] = useState<string>('');
   const [characterList, setCharacterList] = useState<NormalizedCharacter[]>([]);
   const [planetCache, setPlanetCache] = useState<Record<string, string>>({});
 
   // Fetch character list (normal or search)
   const { data, isLoading: isFetchingCharacters, error } = useQuery<CharactersResponse, Error>({
-    queryKey: ['characters', page, limit, search],
-    queryFn: () => fetchCharacters(page, limit, search),
+    queryKey: ['characters', page, limit, searchQuery],
+    queryFn: () => fetchCharacters(page, limit, searchQuery),
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
   });
@@ -78,24 +79,7 @@ const CharacterList: React.FC = () => {
   useEffect(() => {
     const processCharacters = async () => {
       if (data) {
-        if (search && data.result) {
-          // Handle search response
-          const mappedCharacters = await Promise.all(
-            data.result.map(async (char: PaginatedCharacter): Promise<NormalizedCharacter> => {
-              const characterDetails: CharacterResponse = await fetchCharacter(char.uid);
-              const properties = characterDetails.result.properties;
-              const homeworldName = properties.homeworld
-                ? await fetchPlanetWithCache(properties.homeworld)
-                : 'unknown';
-              return {
-                ...properties,
-                uid: char.uid,
-                homeworld: homeworldName,
-              };
-            })
-          );
-          setCharacterList(mappedCharacters);
-        } else if (!search && data.results) {
+        if (data.results) {
           // Handle normal paginated response
           const normalizedCharacters: NormalizedCharacter[] = data.results.map(
             (char: PaginatedCharacter) => ({
@@ -106,11 +90,22 @@ const CharacterList: React.FC = () => {
           );
           setCharacterList(normalizedCharacters);
         }
+        if (data.result) {
+          // Handle search response
+          const normalizedCharacters: NormalizedCharacter[] = data.result.map((char: any) => ({
+            uid: char.properties.uid || char.uid,
+            name: char.properties.name,
+            url: char.properties.url || char.url,
+            gender: char.properties.gender,
+            homeworld: char.properties.homeworld,
+          }));
+          setCharacterList(normalizedCharacters);
+        }
       }
     };
 
     processCharacters();
-  }, [data, search]);
+  }, [data]);
 
   // Fetch character details for normal response
   const characterQueries: UseQueryResult<CharacterResponse, Error>[] = useQueries({
@@ -118,18 +113,17 @@ const CharacterList: React.FC = () => {
       queryKey: ['character', char.uid],
       queryFn: () => fetchCharacter(char.uid),
       staleTime: Infinity,
-      enabled: !!char.uid && !search,
+      enabled: !!char.uid,
     })),
   });
 
   // Extract unique homeworld URLs from character details
   const homeworldUrls = useMemo<string[]>(() => {
-    if (search) return [];
     const urls = characterQueries
       .map((query) => query.data?.result.properties.homeworld)
       .filter((url): url is string => !!url);
     return Array.from(new Set(urls));
-  }, [characterQueries, search]);
+  }, [characterQueries]);
 
   // Fetch planet details for unique homeworld URLs
   const planetQueries: UseQueryResult<PlanetData, Error>[] = useQueries({
@@ -149,10 +143,6 @@ const CharacterList: React.FC = () => {
 
   // Combine character and homeworld data for normal response
   const combinedCharacterList = useMemo(() => {
-    if (search) {
-      return characterList;
-    }
-
     return characterQueries
       .map((query, index) => {
         const charData = characterList[index];
@@ -171,7 +161,7 @@ const CharacterList: React.FC = () => {
         };
       })
       .filter((char) => char !== null);
-  }, [characterQueries, planetQueries, characterList, search]);
+  }, [characterQueries, planetQueries, characterList]);
 
   useEffect(() => {
     if (error) {
@@ -179,24 +169,14 @@ const CharacterList: React.FC = () => {
     }
   }, [error, showError]);
 
-  const handleSearchClick = (searchInput: string): void => {
-    setSearch(searchInput);
-    setPage(1);
-  };
-
-  const handleBackClick = (): void => {
-    setSearch('');
-    setPage(1);
-  };
-
   const handlePageChange = (newPage: number): void => {
     setPage(newPage);
   };
 
   if (
     isFetchingCharacters ||
-    (!search && characterQueries.some((query) => query.isLoading)) ||
-    (!search && planetQueries.some((query) => query.isLoading))
+    characterQueries.some((query) => query.isLoading) ||
+    planetQueries.some((query) => query.isLoading)
   ) {
     return (
       <div className="container">
@@ -207,11 +187,23 @@ const CharacterList: React.FC = () => {
   }
 
   if (error) return <div>Error loading characters</div>;
+  if (combinedCharacterList.length === 0) {
+    return (
+      <div className="no-results-container">
+        <p className="no-results">No characters found.</p>
+        <div className="back-button-container">
+          <button className="back-button" onClick={() => setSearchQuery('')}>
+            Back
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
       <h1 className="title">Star Wars Characters</h1>
-      <SearchBar onSearch={handleSearchClick} />
+      <SearchBar />
       {isFetchingCharacters ? (
         <div className="shimmer-container">
           <Shimmer count={12} />
@@ -235,20 +227,18 @@ const CharacterList: React.FC = () => {
               </div>
             )}
           </div>
-          {search && (
+          {searchQuery && (
             <div className="back-button-container">
-              <button onClick={handleBackClick} className="back-button">
+              <button className="back-button" onClick={() => setSearchQuery('')}>
                 Back
               </button>
             </div>
           )}
-          {!search && (
-            <Pagination
-              currentPage={page}
-              totalPages={search ? 1 : data?.total_pages ?? 1}
-              onPageChange={handlePageChange}
-            />
-          )}
+          <Pagination
+            currentPage={page}
+            totalPages={data?.total_pages ?? 1}
+            onPageChange={handlePageChange}
+          />
         </>
       )}
     </div>

@@ -37,6 +37,7 @@ export interface PaginatedCharacter {
   uid: string;
   name: string;
   url: string;
+  properties?: any
 }
 
 export interface CharactersResponse {

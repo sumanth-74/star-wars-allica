@@ -37,10 +37,10 @@ Note: Couldn't implement the films and starship details as the api response didn
 - Uses a custom `ErrorContext` to show error messages for specific operations.
 
 ### 5. Pagination
-- Provides pagination controls for navigating through the character list. 
+- Provides server-side offset pagination controls for navigating through the character list. 
 
 ### 6. Search Bar
-- Allows users to search for characters by name. It user server-side filtering by making api request using serach parameter and response is displayed
+- Allows users to search for characters by name. It user server-side debounced filtering by making api request using serach parameter with auto suggestions and response is displayed
 
 ## Components
 
