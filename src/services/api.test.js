@@ -1,10 +1,29 @@
+global.fetch = jest.fn();
+
 import { fetchCharacters } from './api';
-import axios from 'axios';
 
-jest.mock('axios');
+describe('fetchCharacters', () => {
+  it('fetches characters successfully', async () => {
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        results: [
+          { name: 'Luke Skywalker', height: '172', gender: 'male' },
+          { name: 'Darth Vader', height: '202', gender: 'male' },
+        ],
+      }),
+    });
 
-test('handles API error for fetchCharacters', async () => {
-  axios.get.mockRejectedValueOnce(new Error('Network Error'));
+    const result = await fetchCharacters(1, 10);
+    expect(result.results).toHaveLength(2);
+    expect(result.results[0].name).toBe('Luke Skywalker');
+  });
 
-  await expect(fetchCharacters(1, 10, '')).rejects.toThrow('Network Error');
+  it('handles API error for fetchCharacters', async () => {
+    fetch.mockResolvedValueOnce({
+      ok: false,
+    });
+
+    await expect(fetchCharacters(1, 10, '')).rejects.toThrow('Failed to fetch characters');
+  });
 });

@@ -7,7 +7,7 @@ const SearchBar: React.FC = () => {
   const { setSearchQuery } = useSearch();
   const [searchInput, setSearchInput] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [debounceTimeout, setDebounceTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   const [cache, setCache] = useState<{ [key: string]: string[] }>({});
 
   useEffect(() => {

@@ -13,8 +13,8 @@ const Favorites: React.FC = () => {
     <div className="container">
       <h1 className="title">Favorite Characters</h1>
       <div className="character-list">
-        {favorites.map((char) => (
-          <div key={char.url} className="character-card">
+        {favorites.map((char, index) => (
+          <div key={index} className="character-card">
             <h3 className="character-name">{char.name}</h3>
             <p className="character-detail">Height: {char.height || 'unknown'}</p>
             <p className="character-detail">Gender: {char.gender || 'unknown'}</p>

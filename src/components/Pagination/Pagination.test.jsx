@@ -8,4 +8,24 @@ describe('Pagination Component', () => {
 
     expect(screen.getAllByRole('button').length).toBe(2);
   });
+
+  it('calls onPageChange with the previous page when handlePrevious is triggered', () => {
+    const mockOnPageChange = jest.fn();
+    render(<Pagination totalPages={3} currentPage={2} onPageChange={mockOnPageChange} />);
+
+    const previousButton = screen.getByText('Previous');
+    fireEvent.click(previousButton);
+
+    expect(mockOnPageChange).toHaveBeenCalledWith(1);
+  });
+
+  it('calls onPageChange with the next page when handleNext is triggered', () => {
+    const mockOnPageChange = jest.fn();
+    render(<Pagination totalPages={3} currentPage={2} onPageChange={mockOnPageChange} />);
+
+    const nextButton = screen.getByText('Next');
+    fireEvent.click(nextButton);
+
+    expect(mockOnPageChange).toHaveBeenCalledWith(3);
+  });
 });

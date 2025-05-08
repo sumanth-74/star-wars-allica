@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Shimmer Component matches snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="shimmer-container"
+  >
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+    <div
+      class="shimmer-item"
+    />
+  </div>
+</DocumentFragment>
+`;
