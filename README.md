@@ -2,6 +2,11 @@
 
 This project is a Star Wars web application that allows users to explore characters, view their details, and manage their favorite characters. The application is built using React and leverages modern libraries like `react-query` for data fetching and caching.
 
+### Test Cases 
+
+![Screenshot 2025-05-08 at 6 39 30 PM](https://github.com/user-attachments/assets/9a18de01-8e5d-4ac5-b503-9cd8e2595015)
+
+
 ## Deployment
 
 The code has been deployed to vercel and the live version can be accessed through this link: https://star-wars-allica.vercel.app/
