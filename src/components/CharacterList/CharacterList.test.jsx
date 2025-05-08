@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CharacterList from './CharacterList';
-import { useQuery } from '@tanstack/react-query';
 import { ErrorProvider } from '../../contexts/ErrorContext';
 import { SearchProvider } from '../../contexts/SearchContext';
 
@@ -39,7 +38,6 @@ const renderWithProviders = (ui) => {
   );
 };
 
-// Updated test cases to align with the mocked `CharacterList` component.
 describe('CharacterList Component', () => {
   it('renders the list of characters', () => {
     renderWithProviders(

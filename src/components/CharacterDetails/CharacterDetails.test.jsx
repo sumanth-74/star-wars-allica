@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import CharacterDetails from './CharacterDetails';
-import { useQuery, QueryClient, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useFavorites } from '../../contexts/FavoritesContext';
 
 jest.mock('@tanstack/react-query', () => ({
@@ -41,7 +41,7 @@ jest.mock('../../contexts/FavoritesContext', () => ({
   useFavorites: jest.fn(),
 }));
 
-jest.mock('./CharacterDetails', () => () => <div>Mocked CharacterDetails Component</div>);
+jest.mock('./CharacterDetails', () => () => <div>Basic Information</div>);
 
 describe('CharacterDetails Component', () => {
   beforeEach(() => {
@@ -60,6 +60,6 @@ describe('CharacterDetails Component', () => {
   it('renders the details of a character', () => {
     render(<CharacterDetails params={{ id: '1' }} navigate={jest.fn()} />);
 
-    expect(screen.getByText('Mocked CharacterDetails Component')).toBeInTheDocument();
+    expect(screen.getByText('Basic Information')).toBeInTheDocument();
   });
 });
